@@ -1,0 +1,6 @@
+"use strict";
+
+var ohHey = "Hello World";
+
+console.log(ohHey);
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1haW4uanMiXSwibmFtZXMiOlsib2hIZXkiLCJjb25zb2xlIiwibG9nIl0sIm1hcHBpbmdzIjoiOztBQUFBLElBQU1BLFFBQVEsYUFBZDs7QUFFQUMsUUFBUUMsR0FBUixDQUFZRixLQUFaIiwiZmlsZSI6Im1haW4uanMiLCJzb3VyY2VzQ29udGVudCI6WyJjb25zdCBvaEhleSA9IFwiSGVsbG8gV29ybGRcIjtcblxuY29uc29sZS5sb2cob2hIZXkpOyJdfQ==
