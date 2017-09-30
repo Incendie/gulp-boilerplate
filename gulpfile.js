@@ -23,7 +23,7 @@ gulp.task('js', () => {
     browserify('dev/scripts/main.js', {debug: true})
         .transform('babelify', {
             sourceMaps: true,
-            presets: ['es2015','react']
+            presets: ["env"]
         })
         .bundle()
         .on('error',notify.onError({
