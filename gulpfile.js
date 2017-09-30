@@ -1,59 +1,52 @@
-const gulp = require("gulp");
-const sass = require("gulp-sass");
-const concat = require("gulp-concat");
-const babel = require("gulp-babel");
-const autoprefixer = require('gulp-autoprefixer');
-const browserSync = require('browser-sync').create();
+// gulpfile.js
+const gulp = require('gulp');
+const babel = require('babelify');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const browserSync = require('browser-sync');
 const reload = browserSync.reload;
-const sourcemaps = require('gulp-sourcemaps');
-const cleanCSS = require('gulp-clean-css');
+const notify = require('gulp-notify');
+const sass = require('gulp-sass');
 const plumber = require('gulp-plumber');
+const concat = require('gulp-concat');
+const historyApiFallback = require('connect-history-api-fallback');
 
-//a task to compile sass
-gulp.task("styles", () => {
-	return gulp.src("./dev/styles/**/*.scss")
-		.pipe(plumber())
-		.pipe(sourcemaps.init())
-		.pipe(sass().on("error", sass.logError))
-		.pipe(autoprefixer('last 2 versions', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1'))
-		.pipe(concat("style.css"))
-		.pipe(cleanCSS({debug: true}, function(details) {
-		      console.log(details.name + ': ' + details.stats.originalSize);
-		      console.log(details.name + ': ' + details.stats.minifiedSize);
-		    }))
-		.pipe(sourcemaps.write())
-		.pipe(plumber.stop())
-		.pipe(gulp.dest("./public/styles"))
-		.pipe(reload({stream: true}));
+gulp.task('styles', () => {
+    return gulp.src('./dev/styles/**/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(concat('style.css'))
+        .pipe(gulp.dest('./public/styles'))
 });
 
-
-//task to compile js
-gulp.task("scripts", () => {
-	return gulp.src("./dev/scripts/**/*.js")
-		.pipe(plumber())
-		.pipe(sourcemaps.init())
-			.pipe(babel({
-				presets: ["es2015"]
-			}))
-		.pipe(sourcemaps.write())
-		.pipe(plumber.stop())
-		.pipe(gulp.dest("./public/scripts"))
-		.pipe(reload({stream: true}));
+gulp.task('js', () => {
+    browserify('dev/scripts/app.js', {debug: true})
+        .transform('babelify', {
+            sourceMaps: true,
+            presets: ['es2015','react']
+        })
+        .bundle()
+        .on('error',notify.onError({
+            message: "Error: <%= error.message %>",
+            title: 'Error in JS 💀'
+        }))
+        .pipe(source('app.js'))
+        .pipe(buffer())
+        .pipe(gulp.dest('public/scripts'))
+        .pipe(reload({stream:true}));
 });
 
-//task to watch other tasks
-gulp.task('watch', () => {
-  gulp.watch('./dev/styles/**/*.scss', ['styles']);
-  gulp.watch('./dev/scripts/main.js', ['scripts']);
-  gulp.watch('./index.html', reload);
-  gulp.watch('*.html', reload);
+gulp.task('bs', () => {
+    browserSync.init({
+        server: {
+            baseDir: './'
+        },
+        middleware: [historyApiFallback()]
+    });
 });
 
-gulp.task('browser-sync', () => {
-  browserSync.init({
-    server: '.'  
-  })
+gulp.task('default', ['js','bs', 'styles'], () => {
+    gulp.watch('dev/**/*.js',['js']);
+    gulp.watch('dev/**/*.scss',['styles']);
+    gulp.watch('./public/styles/style.css',reload);
 });
-
-gulp.task('default', ['browser-sync','styles', 'scripts', 'watch']);
