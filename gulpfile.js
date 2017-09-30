@@ -38,7 +38,7 @@ gulp.task("js", () => {
                 title: "Error in JS 💀"
             })
         )
-        .pipe(source("app.js"))
+        .pipe(source("main.js"))
         .pipe(buffer())
         .pipe(gulp.dest("public/scripts"))
         .pipe(reload({
